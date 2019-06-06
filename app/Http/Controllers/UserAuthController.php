@@ -111,7 +111,7 @@ class UserAuthController extends Controller
             //密碼錯誤回傳錯誤訊息
             $error_message = [
                 'msg' => [
-                    '密碼驗證錯誤'
+                    '密碼錯誤'
                 ]
             ];
 

@@ -45,7 +45,20 @@ class UserAuthController extends Controller
         $input['password'] = Hash::make($input['password']);
 
         //新增會員
-        $Users = User::create($input);
+        try {
+            $user = User::create($input);
+        } catch (\Exception $error) {
+            //新增失敗回傳錯誤訊息
+            $error_message = [
+                'msg' => [
+                    '註冊失敗'
+                ]
+            ];
+
+            return redirect('/user/auth/sign-up')
+                ->withErrors($error_message)
+                ->withInput();
+        }
 
         //重新導向到登入頁
         return redirect('/user/auth/sign-in');
@@ -76,7 +89,20 @@ class UserAuthController extends Controller
         }
 
         //查詢使用者
-        $user = User::where('email', $input['email'])->firstOrFail();
+        $user = User::where('email', $input['email'])->first();
+
+        if (is_null($user)) {
+            //找不到該使用者
+            $error_message = [
+                'msg' => [
+                    'Email 尚未註冊'
+                ]
+            ];
+
+            return redirect('/user/auth/sign-in')
+                ->withErrors($error_message)
+                ->withInput();
+        }
 
         //驗證密碼(第一個參數為明文)
         $is_password_correct = Hash::check($input['password'], $user->password);

@@ -129,7 +129,7 @@ class UserAuthController extends Controller
 
     public function signOut() {
         //清除 session
-        session()->forget();
+        session()->forget('user_id');
 
         return redirect('/');
     }

@@ -123,4 +123,27 @@ class MerchandiseController extends Controller
         //重新導向至商品編輯頁
         return redirect('/merchandise/' . $merchandise->id . '/edit');
     }
+
+    public function merchandiseManageListPage() {
+        //每頁資料量
+        $row_per_page = 10;
+
+        //撈取商品分頁資料
+        $merchandisePaginate = Merchandise::OrderBy('created_at', 'desc')
+            ->paginate($row_per_page);
+
+        //設定商品圖片網址
+        foreach ($merchandisePaginate as &$merchandise) {
+            if ( ! is_null($merchandise->photo)) {
+                $merchandise->photo = url($merchandise->photo);
+            }
+        }
+
+        $binding = [
+            'title' => '管理商品',
+            'merchandisePaginate' => $merchandisePaginate
+        ];
+
+        return view('merchandise.manageMerchandise', $binding);
+    }
 }

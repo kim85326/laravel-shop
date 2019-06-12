@@ -146,4 +146,28 @@ class MerchandiseController extends Controller
 
         return view('merchandise.manageMerchandise', $binding);
     }
+
+    public function merchandiseListPage() {
+        //每頁資料量
+        $row_per_page = 10;
+
+        //撈取商品分頁資料
+        $merchandisePaginate = Merchandise::OrderBy('updated_at', 'desc')
+            ->where('status', 'S') //可販售的
+            ->paginate($row_per_page);
+
+        //設定商品圖片網址
+        foreach ($merchandisePaginate as &$merchandise) {
+            if ( ! is_null($merchandise->photo)) {
+                $merchandise->photo = url($merchandise->photo);
+            }
+        }
+
+        $binding = [
+            'title' => '商品列表',
+            'merchandisePaginate' => $merchandisePaginate
+        ];
+
+        return view('merchandise.listMerchandise', $binding);
+    }
 }

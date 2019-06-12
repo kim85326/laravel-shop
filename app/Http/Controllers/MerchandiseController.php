@@ -170,4 +170,21 @@ class MerchandiseController extends Controller
 
         return view('merchandise.listMerchandise', $binding);
     }
+
+    public function merchandiseItemPage($merchandise_id) {
+        //撈取商品資料
+        $merchandise = Merchandise::findOrFail($merchandise_id);
+
+        //設定商品圖片網址
+        if ( ! is_null($merchandise->photo)) {
+            $merchandise->photo = url($merchandise->photo);
+        }
+
+        $binding = [
+            'title' => '商品頁',
+            'merchandise' => $merchandise
+        ];
+
+        return view('merchandise.showMerchandise', $binding);
+    }
 }

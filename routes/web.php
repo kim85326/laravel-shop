@@ -48,6 +48,6 @@ Route::group(['prefix' => 'merchandise'], function () {
         //商品單品資料修改
         Route::put('/', 'MerchandiseController@merchandiseItemUpdateProcess')->middleware(['user.auth.admin']);
         //購買商品
-        Route::post('/buy', 'MerchandiseController@merchandiseItemBuyProcess');
+        Route::post('/buy', 'MerchandiseController@merchandiseItemBuyProcess')->middleware(['user.auth']);
     });
 });

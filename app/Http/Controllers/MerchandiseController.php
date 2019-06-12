@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Merchandise;
 use Illuminate\Http\Request;
+use Validator;
+use Image;
 
 class MerchandiseController extends Controller
 {
@@ -54,5 +56,71 @@ class MerchandiseController extends Controller
             'merchandise' => $merchandise
         ];
         return view('merchandise.editMerchandise', $binding);
+    }
+
+    public function merchandiseItemUpdateProcess($merchandise_id) {
+        //撈取商品資料
+        $merchandise = Merchandise::findOrFail($merchandise_id);
+
+        //接受輸入資料
+        $input = request()->all();
+
+        //驗證規則
+        $rules = [
+            'status' => 'required|in:C,S',
+            'name' => 'required|max:80',
+            'name_en' => 'required|max:80',
+            'introduction' => 'required|max:2000',
+            'introduction_en' => 'required|max:2000',
+            'photo' => 'file|image|max:10240',
+            'price' => 'required|integer|min:0',
+            'remain_count' => 'required|integer|min:0',
+        ];
+
+        //驗證資料
+        $validation = Validator::make($input, $rules);
+
+        if ($validation->fails()) {
+            //資料驗證錯誤
+            return redirect('/merchandise/' . $merchandise->id . '/edit')
+                ->withErrors($validation)
+                ->withInput();
+        }
+
+        if (isset($input['photo'])) {
+            //有上傳圖片
+            $photo = $input['photo'];
+            //檔案副檔名
+            $file_extension = $photo->getClientOriginalExtension();
+            //產生自訂隨機檔案名稱
+            $file_name = uniqid() . '.' . $file_extension;
+            //檔案相對路徑
+            $file_relative_path = 'images/merchandise/' . $file_name;
+            //檔案存放目錄為對外公開 public 目錄下的相對路徑
+            $file_path = public_path($file_relative_path);
+            //裁切圖片
+            $image = Image::make($photo)->fit(450, 300)->save($file_path);
+            //設定圖片檔案相對路徑
+            $input['photo'] = $file_relative_path;
+        }
+
+        //更新商品資訊
+        try {
+            $merchandise->update($input);
+        } catch (\Exception $error) {
+            //更新失敗回傳錯誤訊息
+            $error_message = [
+                'msg' => [
+                    '更新失敗'
+                ]
+            ];
+
+            return redirect('/merchandise/' . $merchandise->id . '/edit')
+                ->withErrors($error_message)
+                ->withInput();
+        }
+
+        //重新導向至商品編輯頁
+        return redirect('/merchandise/' . $merchandise->id . '/edit');
     }
 }

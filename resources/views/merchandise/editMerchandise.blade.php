@@ -58,7 +58,11 @@
             <label>
                 商品照片：
                 <input type="file" name="photo">
-                <img src="{{ $merchandise->photo or '/assert/images/default-merchandise.png' }}">
+                @if(is_null($merchandise->photo))
+                    <img src="{{ url('/assert/images/default-merchandise.jpeg') }}">
+                @else
+                    <img src="{{ $merchandise->photo }}">
+                @endif
             </label>
 
             <label>

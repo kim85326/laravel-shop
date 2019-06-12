@@ -51,3 +51,6 @@ Route::group(['prefix' => 'merchandise'], function () {
         Route::post('/buy', 'MerchandiseController@merchandiseItemBuyProcess')->middleware(['user.auth']);
     });
 });
+
+// 交易
+Route::get('/transaction', 'TransactionController@transactionListPage')->middleware(['user.auth']);
